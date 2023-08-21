@@ -1,0 +1,15 @@
+{
+  "name": "anime-x",
+  "version": "1.0.0",
+  "description": "Explore the captivating realm of anime with animeX, your ultimate OTT destination. Immerse yourself in a handpicked selection of series and movies, experiencing the enchantment of animated storytelling.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "anime",
+    "animation"
+  ],
+  "author": "manoj",
+  "license": "ISC"
+}
