@@ -1,4 +1,4 @@
-const { AnimeCover } = require("../models/Anime");
+const { AnimeCover } = require("../models/AnimeModal");
 
 module.exports = SampleAnimeCover = [
   {

@@ -1,18 +1,17 @@
-exports.AnimeCover = class AnimeCover {
-  constructor(id, animeName, coverImgUrl) {
-    this.id = id;
-    this.animeName = animeName;
-    this.coverImgUrl = coverImgUrl;
-  }
-};
+const mongoose = require("mongoose");
 
-exports.AnimeEpisode = class AnimeEpisode {
-  constructor(id, episodeNo, episodeName, episodeImageUrl, desc, timing) {
-    this.id = id;
-    this.episodeNo = episodeNo;
-    this.episodeName = episodeName;
-    this.episodeImageUrl = episodeImageUrl;
-    this.desc = desc;
-    this.timing = timing;
-  }
-};
+const Schema = mongoose.Schema;
+
+const AnimeSchema = new Schema({
+  name: String,
+  description: String,
+  coverImgUrl: String,
+  Category: {
+    type: Schema.Types.ObjectId,
+    ref: "Category",
+  },
+  noOfSeasons: Number,
+  episodoList: [{ type: Schema.Types.ObjectId, ref: "Episode" }],
+});
+
+module.exports = mongoose.model("Anime", AnimeSchema);

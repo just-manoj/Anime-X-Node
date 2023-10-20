@@ -1,4 +1,4 @@
-const { AnimeEpisode } = require("../models/Anime");
+const { AnimeEpisode } = require("../models/AnimeModal");
 
 module.exports = sampleAnimeEpisode = {
   animeName: "Naruto",
