@@ -11,7 +11,7 @@ const AnimeSchema = new Schema({
     ref: "Category",
   },
   noOfSeasons: Number,
-  episodoList: [{ type: Schema.Types.ObjectId, ref: "Episode" }],
+  episodeList: [{ type: Schema.Types.ObjectId, ref: "Episode" }],
 });
 
 module.exports = mongoose.model("Anime", AnimeSchema);

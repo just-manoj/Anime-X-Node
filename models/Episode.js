@@ -9,6 +9,7 @@ const EpisodeSchema = new Schema({
   duration: String,
   noOfEpisode: Number,
   thumnailUrl: String,
+  noOfSeason: Number,
 });
 
 module.exports = mongoose.model("Episode", EpisodeSchema);
