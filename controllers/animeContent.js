@@ -91,10 +91,33 @@ exports.getAnimeNoOfSeason = async (req, res) => {
   }
 };
 
-exports.getAnimeEpisodes = (req, res) => {
+exports.getAnimeEpisodes = async (req, res) => {
   const { category, animeName } = req.params || {};
+  const { season } = req.query || {};
 
-  res.status(200).json({
-    animeEpisode: AnimeEpisode,
-  });
+  try {
+    const cat = await Category.findOne({ name: category });
+
+    const selectedAnimeDetails = await Anime.findOne({
+      Category: cat._id,
+      name: animeName,
+    });
+
+    const episodesList = [];
+
+    for (const episodeId of selectedAnimeDetails.episodeList) {
+      const episode = await Episode.findOne({
+        _id: episodeId,
+        noOfSeason: season,
+      });
+      episodesList.push(episode);
+    }
+
+    res.status(200).json({
+      episodesList: episodesList,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "An error occurred" });
+  }
 };
