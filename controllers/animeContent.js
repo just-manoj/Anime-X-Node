@@ -7,6 +7,8 @@ const Episode = require("../models/Episode");
 const Anime = require("../models/Anime");
 
 exports.getAllContent = async (req, res, next) => {
+  const CORRENT_IP = req.ip.substring(7);
+  const CORRENT_PORT = req.socket.localPort;
   try {
     const category = await Category.find();
     const animeContent = [];
@@ -28,7 +30,7 @@ exports.getAllContent = async (req, res, next) => {
           id: animeDet._id,
           animeName: animeDet.name,
           description: animeDet.description,
-          coverImgUrl: animeDet.coverImgUrl,
+          coverImgUrl: `http://${CORRENT_IP}:${CORRENT_PORT}${animeDet.coverImgUrl}`,
         };
         animeContent[index].animeList.push(animeDetails);
       });
@@ -43,11 +45,17 @@ exports.getAllContent = async (req, res, next) => {
 };
 
 exports.getBanner = async (req, res, next) => {
+  const CORRENT_IP = req.ip.substring(7);
+  const CORRENT_PORT = req.socket.localPort;
+
   const banner = await Banner.find();
   const bannerImages = [];
 
   banner.forEach((b) => {
-    bannerImages.push(b.imageUrl);
+    bannerImages.push({
+      img: `http://${CORRENT_IP}:${CORRENT_PORT}${b.imageUrl}`,
+    });
+    // bannerImages.push(b.imageUrl);
   });
 
   res.status(200).json({
@@ -92,6 +100,9 @@ exports.getAnimeNoOfSeason = async (req, res) => {
 };
 
 exports.getAnimeEpisodes = async (req, res) => {
+  const CORRENT_IP = req.ip.substring(7);
+  const CORRENT_PORT = req.socket.localPort;
+
   const { category, animeName } = req.params || {};
   const { season } = req.query || {};
 
@@ -106,11 +117,16 @@ exports.getAnimeEpisodes = async (req, res) => {
     const episodesList = [];
 
     for (const episodeId of selectedAnimeDetails.episodeList) {
-      const episode = await Episode.findOne({
+      let episode = await Episode.findOne({
         _id: episodeId,
         noOfSeason: season,
       });
-      episodesList.push(episode);
+
+      episodesList.push({
+        ...episode._doc,
+        thumnailUrl: `http://${CORRENT_IP}:${CORRENT_PORT}${episode.thumnailUrl}`,
+        videoUrl: `http://${CORRENT_IP}:${CORRENT_PORT + 1}${episode.videoUrl}`,
+      });
     }
 
     res.status(200).json({
