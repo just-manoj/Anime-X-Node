@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 
 const authRoute = require("./routes/auth");
 const contentRoute = require("./routes/animeContent");
+const userRoute = require("./routes/user");
 
 const MONGODB_CONN = "mongodb://127.0.0.1:27017/animex";
 
@@ -17,6 +18,7 @@ app.use("/assets", express.static(path.join(__dirname, "assets"))); //access as 
 
 app.use("/auth", authRoute);
 app.use("/content", contentRoute);
+app.use("/user", userRoute);
 
 mongoose
   .connect(MONGODB_CONN)
