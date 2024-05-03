@@ -20,6 +20,7 @@ exports.getProfile = async (req, res, next) => {
 
 exports.changePassword = async (req, res, next) => {
   const { password } = req.body || {};
+  console.log(req.body);
   try {
     const user = await User.findById(req.userId);
     const cryptoPassword = await bcrypto.hash(password, 12);

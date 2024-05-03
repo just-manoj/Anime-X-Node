@@ -99,7 +99,6 @@ exports.getOTP = async (req, res, next) => {
       throw error;
     }
     // buna kmde skzj ftph
-    const expirationTime = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes in milliseconds
     const otp = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
 
     const cryptoOTP = await bcrypto.hash(otp.toString(), 12);
@@ -185,7 +184,7 @@ exports.verifyOTP = async (req, res, next) => {
         user.emailVerified = isValid;
         user.save();
         res.status(201).json({
-          message: "OTP send successfully",
+          message: "OTP Verified successfully",
           status: "success",
         });
       } else {
@@ -202,6 +201,141 @@ exports.verifyOTP = async (req, res, next) => {
     }
   } catch (error) {
     res.status(400).json({
+      message: error.message,
+      status: "failed",
+    });
+  }
+};
+
+exports.getOTPToMail = async (req, res, next) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      const error = new Error("Mail Id doesn't Exists");
+      throw error;
+    }
+    // buna kmde skzj ftph
+    const otp = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
+
+    const cryptoOTP = await bcrypto.hash(otp.toString(), 12);
+    user.otp.otpString = cryptoOTP;
+    user.otp.time = new Date();
+    user.save();
+
+    var transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "verify.animex@gmail.com",
+        pass: "buna kmde skzj ftph",
+        name: "Anime X",
+      },
+    });
+
+    var mailOptions = {
+      from: "verify.animex@gmail.com",
+      to: user.email,
+      subject: "Anime X OTT - Reset Password",
+      html: `
+      <!DOCTYPE html>
+        <html lang="en">
+        <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Anime X OTT - Reset Password</title>
+        </head>
+        <body>
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2>Anime X OTT - Reset Password</h2>
+            <p>Dear User,</p>
+            <p>You're receiving this email because you requested to reset your password for Anime X OTT. Please use the OTP provided below to reset your password:</p>
+            <p>OTP: <strong>${otp}</strong></p>
+            <p>This OTP is valid for 15 minutes only.</p>
+            <p><strong>Important:</strong> Please do not share this email or OTP with anyone. It's meant for your use only.</p>
+            <p>If you didn't request this email, you can safely ignore it.</p>
+            <p>Thank you for using Anime X OTT!</p>
+            <hr>
+            <p style="font-size: 0.8em; color: #777;">This email was sent automatically. Please do not reply to this email.</p>
+          </div>
+        </body>
+        </html>
+    `,
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        // console.log("Email sent: " + info.response);
+      }
+    });
+
+    res.status(201).json({
+      message: "OTP send successfully",
+      status: "success",
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+      status: "failed",
+    });
+  }
+};
+
+exports.verifyOTPFromMail = async (req, res, next) => {
+  const { email, otp } = req.body || {};
+  try {
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      const error = new Error("Mail Id doesn't Exists");
+      throw error;
+    }
+
+    const otpTime = new Date(user.otp.time).getTime();
+    const currentTime = new Date().getTime();
+    const timeDifference = currentTime - otpTime;
+
+    if (timeDifference <= 15 * 60 * 1000) {
+      const isValid = await bcrypto.compare(otp.toString(), user.otp.otpString);
+      if (isValid) {
+        res.status(201).json({
+          message: "OTP Verified successfully",
+          status: "success",
+        });
+      } else {
+        res.status(400).json({
+          message: "Invalid OTP",
+          status: "failed",
+        });
+      }
+    } else {
+      res.status(400).json({
+        message: "Time Out",
+        status: "failed",
+      });
+    }
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+      status: "failed",
+    });
+  }
+};
+
+exports.changePassword = async (req, res, next) => {
+  const { email, password } = req.body || {};
+  try {
+    const user = await User.findOne({ email: email });
+    const cryptoPassword = await bcrypto.hash(password, 12);
+    user.password = cryptoPassword;
+    user.save();
+
+    res.status(201).json({
+      message: "Password Chanaged Successfully",
+      status: "success",
+    });
+  } catch (error) {
+    res.status(404).json({
       message: error.message,
       status: "failed",
     });
