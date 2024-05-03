@@ -10,6 +10,10 @@ const EpisodeSchema = new Schema({
   noOfEpisode: Number,
   thumnailUrl: String,
   noOfSeason: Number,
+  anime: {
+    type: Schema.Types.ObjectId,
+    ref: "Anime",
+  },
 });
 
 module.exports = mongoose.model("Episode", EpisodeSchema);
